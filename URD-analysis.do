@@ -257,73 +257,11 @@ label variable t5_l29_cb2 enabling_service_virtual_visit
 /*Generate labels Non-Clinical Staff*/
 label variable t5_l33_ca total_facility_fte 
 
-/*Generate state Dummy Variables*/
-generate state = 1 if healthcenterstate == "AK"
-replace state = 2 if healthcenterstate == "AL"
-replace state = 3 if healthcenterstate == "AR"
-replace state = 4 if healthcenterstate == "AS"
-replace state = 5 if healthcenterstate == "AZ"
-replace state = 6 if healthcenterstate == "CA"
-replace state = 7 if healthcenterstate == "CO"
-replace state = 8 if healthcenterstate == "CT"
-replace state = 9 if healthcenterstate == "DC"
-replace state = 10 if healthcenterstate == "DE"
-replace state = 11 if healthcenterstate == "FL"
-replace state = 12 if healthcenterstate == "FM"
-replace state = 13 if healthcenterstate == "GA"
-replace state = 14 if healthcenterstate == "GU"
-replace state = 15 if healthcenterstate == "HI"
-replace state = 16 if healthcenterstate == "IA"
-replace state = 17 if healthcenterstate == "ID"
-replace state = 18 if healthcenterstate == "IL"
-replace state = 19 if healthcenterstate == "IN"
-replace state = 20 if healthcenterstate == "KS"
-replace state = 21 if healthcenterstate == "KY"
-replace state = 22 if healthcenterstate == "LA"
-replace state = 23 if healthcenterstate == "MA"
-replace state = 24 if healthcenterstate == "MD"
-replace state = 25 if healthcenterstate == "ME"
-replace state = 26 if healthcenterstate == "MH"
-replace state = 27 if healthcenterstate == "MI"
-replace state = 28 if healthcenterstate == "MN"
-replace state = 29 if healthcenterstate == "MO"
-replace state = 30 if healthcenterstate == "MP"
-replace state = 31 if healthcenterstate == "MS"
-replace state = 32 if healthcenterstate == "MT"
-replace state = 33 if healthcenterstate == "NC"
-replace state = 34 if healthcenterstate == "ND"
-replace state = 35 if healthcenterstate == "NE"
-replace state = 36 if healthcenterstate == "NH"
-replace state = 37 if healthcenterstate == "NJ"
-replace state = 38 if healthcenterstate == "NM"
-replace state = 39 if healthcenterstate == "NV"
-replace state = 40 if healthcenterstate == "NY"
-replace state = 41 if healthcenterstate == "OH"
-replace state = 42 if healthcenterstate == "OK"
-replace state = 43 if healthcenterstate == "OR"
-replace state = 44 if healthcenterstate == "PA"
-replace state = 45 if healthcenterstate == "PR"
-replace state = 46 if healthcenterstate == "PW"
-replace state = 47 if healthcenterstate == "RI"
-replace state = 48 if healthcenterstate == "SC"
-replace state = 49 if healthcenterstate == "SD"
-replace state = 50 if healthcenterstate == "TN"
-replace state = 51 if healthcenterstate == "TX"
-replace state = 52 if healthcenterstate == "UT"
-replace state = 53 if healthcenterstate == "VA"
-replace state = 54 if healthcenterstate == "VI"
-replace state = 55 if healthcenterstate == "VT"
-replace state = 56 if healthcenterstate == "WA"
-replace state = 57 if healthcenterstate == "WI"
-replace state = 58 if healthcenterstate == "WV"
-replace state = 59 if healthcenterstate == "WY"
-replace state = . if missing(healthcenterstate) /*0 missing observations*/
-
 /*Generate physician ratio variable*/
 gen patient_physician_ratio = t3b_l8_cd / t5_l8_ca
 
 /*Estimate physician ratio averages across states rural*/
-collapse (mean) patient_physician_ratio, by(state ruralurbanflag)
+collapse (mean) patient_physician_ratio, by(healthcenterstate ruralurbanflag)
 
 /*Macro for data import*/
 global control "import excel "/Users/finndobkin/Desktop/patient_physican.xlsx", sheet("Sheet2") firstrow case(lower) clear"
@@ -335,7 +273,7 @@ $control
 gen patient_nppacnm_ratio = t3b_l8_cd / t5_l10a_ca 
 
 /*Estimate nurse practicioner ratio averages across states rural*/
-collapse (mean) patient_nppacnm_ratio, by(state ruralurbanflag)
+collapse (mean) patient_nppacnm_ratio, by(healthcenterstate ruralurbanflag)
 
 /*Reimport*/
 $control
@@ -344,5 +282,71 @@ $control
 gen patient_nursingstaff = t3b_l8_cd / t5_l15_ca
 
 /*Estimate nurse practicioner ratio averages across states rural*/
-collapse (mean) patient_nursingstaff, by(state ruralurbanflag)
+collapse (mean) patient_nursingstaff, by(healthcenterstate ruralurbanflag)
 
+//**Estimate size of center**//
+/*Descritive analysis*/
+summarize t5_l8_ca, detail
+
+/*Generate variable for center size by physician FTE*/
+gen center_size = 1 if t5_l8_ca > 0 & t5_l8_ca <= 2.17
+replace center_size = 2 if t5_l8_ca > 2.17 & t5_l8_ca <= 5.18
+replace center_size = 3 if t5_l8_ca > 5.18 & t5_l8_ca <= 11.88
+replace center_size = 4 if t5_l8_ca > 11.88
+
+/*Generate physician ratio variable*/
+gen patient_physician_ratio = t3b_l8_cd / t5_l8_ca
+
+/*Estimate average ppr by center size*/
+sort state
+by state : tabulate center_size 
+
+/*Generate new center size variable*/
+drop center_size 
+gen center_size = 1 if t5_l8_ca > 0 & t5_l8_ca <= 2
+replace center_size = 2 if t5_l8_ca > 2 & t5_l8_ca <= 5
+replace center_size = 3 if t5_l8_ca > 5 & t5_l8_ca <= 11
+replace center_size = 4 if t5_l8_ca > 11
+
+//**Other Data Elements**//
+/*Macro for data import*/
+global control " import delimited "/Users/finndobkin/Desktop/healthcenter.csv", case(preserve) clear"
+
+/*Reimport*/
+$control
+
+/*Label variables*/
+label variable Tode_L1a_Ca "Number of physicians, CNPs, and PAs with DATA waiver to treat opioid use disorder" --x
+label variable Tode_L1b_Ca "Number of patients received medication assisted treatment for opioid use disorder" --x
+label variable Tode_L2a1_Ca "Did your organization use telemedicine to provide remote clinical services?" --x 
+label variable Tode_L2a2_Ca "Who did you use telemdicine to communicate with?" 
+label variable Tode_L2a3_Ca "What primary telemedicine services were used at your organization"
+label variable Tode_L2a3_Other "Other primary telemedicine services used at your organization?"
+label variable Tode_L2b_Ca "If you did not have telemdedicine services, please comment why?"
+label variable Tode_L2b_Other "Other policy barriers."
+label variable Tode_L2b0_Ca "Broadmand/telecommunication barriers"
+label variable Tode_L2b0_Other "Other broadband/telecommunication barriers."
+label variable Tode_L2b1_Ca "Lacked telemedicine because unfamiliar with telehealth services options"
+label variable Tode_L2b1_Other "Other"
+label variable Tode_L3_Ca "Number of assists provided during the past year"
+label variable Tode_L2_Ca "Did your organization use telemedicine to provide remote services"
+
+/*Recode Tode_L1a_Ca */
+gen opioid_treat_physicians = Tode_L1a_Ca
+
+/*Recode Tode_L1b_Ca*/
+gen patient_opioid_meds = Tode_L1b_Ca
+
+/*Recode Tode_L2a1_Ca*/
+encode Tode_L2a1_Ca, gen(remote_telehealth_services)
+
+/*Recode Tode_L2_Ca*/
+gen telehealth_services_dummy = 1 if Tode_L2_Ca == "Yes"
+replace telehealth_services_dummy = 0 if Tode_L2_Ca == "No"
+
+/*Estimate number of centers using telehealth services*/
+sort telehealth_services_dummy
+by telehealth_services_dummy : tabulate state
+
+/*Filter centers that don't access telemedicine*/
+drop if telehealth_services_dummy == 1 
