@@ -82,3 +82,5 @@ gen hispanic_ratio = hispanic_positive / hispanic_total
 ttest hispanic_ratio, by(expansion)
 sort surveydate expansion
 collapse (mean) hispanic_ratio, by (expansion surveydate)
+
+/*Asian*/
