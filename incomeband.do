@@ -160,3 +160,32 @@ by income: tabulate other
 
 sort income 
 by income : tabulate already_covid
+
+/*Import macro*/
+global control "import delimited "/Users/finndobkin/Desktop/pulse2021_puf_29.csv""
+$control
+
+/*Exclude non-SNAP recipients*/
+keep if snap_yn == 1 /*(73,431 observations deleted)*/
+
+/*Exclude active duty*/
+keep if actvduty1 == 1 /*(63 observations deleted)*/
+
+/*Expansion dummy*/
+gen expansion = 1 if est_st == 2 | est_st == 4 | est_st == 5 | est_st == 6 | est_st == 8 | est_st == 9 | est_st == 10 | est_st == 11 | est_st == 15 | est_st == 16 | est_st == 17 | est_st == 18 | est_st == 19 | est_st == 21 | est_st == 22 | est_st == 23 | est_st == 24 | est_st == 25 | est_st == 26 | est_st == 27 | est_st == 2 | est_st == 30 | est_st == 31 | est_st == 32 | est_st == 33 | est_st == 34| est_st == 35 | est_st == 36 | est_st == 38 | est_st == 39 | est_st == 41 | est_st == 42 | est_st == 44 | est_st == 49 | est_st == 50 | est_st == 51 | est_st == 53 | est_st == 54
+replace expansion = 0 if est_st == 1 | est_st == 12 | est_st == 13 | est_st == 20 | est_st == 28 | est_st == 29 | est_st == 37 | est_st == 40 | est_st == 45 | est_st == 46 | est_st == 47 | est_st == 48 | est_st == 55 | est_st == 56
+
+/*chi square test on vaccine*/
+tabulate recvdvacc expansion, chi2
+
+/*chi square test for concern of cost*/
+$control
+gen cost = 0 if whynot8 == -99 | whynot8 == -88
+replace cost = 1 if whynot8 == 1
+tabulate cost expansion, chi2
+
+/*chi square test for covid positivity*/
+$control
+gen covid = 1 if hadcovid == 1 
+replace covid = 0 if hadcovid == 2 
+tabulate covid expansion, chi2
