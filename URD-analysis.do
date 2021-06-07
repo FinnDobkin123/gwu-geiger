@@ -3,6 +3,10 @@
 encode grantnumber, gen(grantid)
 encode bhcmisid, gen(bhcid)
 
+//Expansion**//
+gen expansion = 0 if healthcenterstate == "AL" | healthcenterstate == "FL" | healthcenterstate == "GA" | healthcenterstate == "KS" | healthcenterstate == "MS" | healthcenterstate == "NC" | healthcenterstate == "SC" | healthcenterstate == "SD" | healthcenterstate == "MO" | healthcenterstate == "OK" | healthcenterstate == "TN" | healthcenterstate == "TX" | healthcenterstate == "WI" | healthcenterstate == "WY"
+replace expansion = 1 if healthcenterstate != "AL" | healthcenterstate != "FL" | healthcenterstate != "GA" | healthcenterstate != "KS" | healthcenterstate != "MS" | healthcenterstate != "NC" | healthcenterstate != "SC" | healthcenterstate != "SD" | healthcenterstate != "MO" | healthcenterstate != "OK" | healthcenterstate != "TN" | healthcenterstate != "TX" | healthcenterstate != "WI" | healthcenterstate !="WY"
+
 //**Dummy Variable for Site Status**//
 generate sitestat = 0
 replace sitestat = 1 if sitestatus == "Active"
