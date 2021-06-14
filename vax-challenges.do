@@ -38,7 +38,15 @@ tabulate vax_staffing expansion, chi2
 tabulate vax_supply expansion, chi2
 tabulate vax_reimbursement expansion, chi2
 
-
+#Test Results Turnaround time
+gen testtime = 1 if testresultsturnaroundtime == "<1 hour"
+replace testtime = 2 if testresultsturnaroundtime == "12 hours or less"
+replace testtime = 3 if testresultsturnaroundtime == "1-24 hours"
+replace testtime = 4 if testresultsturnaroundtime == "24 hrs"
+replace testtime = 5 if testresultsturnaroundtime == ">24 hrs"
+replace testtime = 6 if testresultsturnaroundtime == "2-3 days"
+replace testtime = 7 if testresultsturnaroundtime == "4-5 days"
+replace testtime = 8 if testresultsturnaroundtime == "More than 5 days"
 
 
 /*Testing Capacity*/
