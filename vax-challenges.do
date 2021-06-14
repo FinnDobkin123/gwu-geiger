@@ -48,6 +48,7 @@ replace testtime = 6 if testresultsturnaroundtime == "2-3 days"
 replace testtime = 7 if testresultsturnaroundtime == "4-5 days"
 replace testtime = 8 if testresultsturnaroundtime == "More than 5 days"
 
+median testtime, by(expansion) medianties(below)
 
 /*Testing Capacity*/
 $control
