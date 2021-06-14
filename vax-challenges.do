@@ -33,8 +33,13 @@ gen vax_no = 1 if challengesdeployingcovidvaccinen == "Yes"
 replace vax_no = 0 if challengesdeployingcovidvaccinen == "No"
 
 /*Total vaccine challenges*/
-ttest vax_no, by(expansion) 
-ttest vax_no, by(expansion) unequal
+tabulate expansion vax_no, chi2
+tabulate expansion vax_staffing, chi2
+tabulate expansion vax_supply, chi2
+tabulate expansion vax_reimbursement, chi2
+
+
+
 
 /*Testing Capacity*/
 $control
