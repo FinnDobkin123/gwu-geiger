@@ -33,10 +33,10 @@ gen vax_no = 1 if challengesdeployingcovidvaccinen == "Yes"
 replace vax_no = 0 if challengesdeployingcovidvaccinen == "No"
 
 /*Total vaccine challenges*/
-tabulate expansion vax_no, chi2
-tabulate expansion vax_staffing, chi2
-tabulate expansion vax_supply, chi2
-tabulate expansion vax_reimbursement, chi2
+tabulate vax_no expansion, chi2
+tabulate vax_staffing expansion, chi2
+tabulate vax_supply expansion, chi2
+tabulate vax_reimbursement expansion, chi2
 
 
 
